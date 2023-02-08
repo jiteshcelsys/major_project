@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useContext } from "react";
 import AfterLogin from './AfterLogin'
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
@@ -23,7 +23,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
-
+import {contextData} from '../context/contextData'
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
     padding: theme.spacing(2),
@@ -63,16 +63,17 @@ BootstrapDialogTitle.propTypes = {
 };
 
 function Login() {
+  const {empNumber, setEmpNumber,empName, setEmpName} = React.useContext(contextData)
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [emp_num, setEmp_num] =React.useState();
+  
 
   const history =useNavigate();
   const SubmitFunction = () => {
     try {
       axios({
         method: "post",
-        url: "http://localhost:3000/login",
+        url: "http://localhost:4000/login",
         header:'application/json',
         data:{
           email:email,
@@ -82,15 +83,23 @@ function Login() {
       }).then((data)=>{
      return data.data
       }).then((data)=>{
-        console.log(data.data[0]?.emp_num)
-        setEmp_num(data.data[0]?.emp_num)
+        setEmpName(data.data[0]?.first_name)
+        console.log(data.data[0]?.first_name);
+        // console.log(data.data[0]?.emp_num)
+        // console.log(data.data[0]?.role_)
         if(data.sucess===true){
-          history('/AfterLogin')
+          setEmpNumber(data.data[0]?.emp_num)
+          console.log(data.data[0]?.role_)
+          history(`/${data.data[0]?.role_}`)
+        }
+        else{
+          history('/Invalid')
         }
         console.log(data.sucess);
       });
     } catch (err) {
       console.log(err.message);
+      console.log('hi')
     }
     console.log('Login ')
     setEmail('');
@@ -103,7 +112,7 @@ function Login() {
   return (
     <>
       
-      {emp_num?<AfterLogin value={emp_num}/>:<Box
+      <Box
         sx={{
           height: "60vh",
           display: "flex",
@@ -155,7 +164,7 @@ function Login() {
             Submit
           </Button>
         </Box>
-      </Box>}
+      </Box>
     </>
   );
 }

@@ -3,7 +3,7 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Signup from "./Signup";
+import UserDetails from "./UserDetails";
 import Login from "./Login";
 import { NavLink } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ export default function Navbar() {
             sx={{ mr: 2 }}
           ></IconButton>
           <div style={ButtonStyle}>
-            <NavLink to='/signup' style={navlink}>SignUp</NavLink>
+            <NavLink to='/userDetails' style={navlink}>SignUp</NavLink>
             <NavLink to='/login' style={navlink}>Login </NavLink>
           </div>
         </Toolbar>

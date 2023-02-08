@@ -21,105 +21,118 @@ import DialogActions from "@mui/material/DialogActions";
 import CloseIcon from "@mui/icons-material/Close";
 import Typography from "@mui/material/Typography";
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate } from "react-router-dom";
+import {contextData} from '../context/contextData'
 
 
 function FormTable() {
   const history = useNavigate();
- 
-  const [emp_num, setEmp_num] = React.useState();
+  const {empNumber, setEmpNumber}= React.useContext(contextData)
+
   const [objective_no, setObjective_no] = React.useState();
   const [individual, setIndividual] = React.useState("");
   const [performance, setPerformance] = React.useState("");
-  const [rating, setRating] = React.useState("");
-  const SubmitFunction =()=>{
+  const [rating, setRating] = React.useState();
+  // console.log(empNumber);
+  const SubmitFunction = () => {
     try {
-      axios({
-        method:'Post',
-        url:"http://localhost:3000/data_emp",
-        header:'application/json',
-        data:{
-          emp_num:emp_num,
-          obj_no:objective_no, 
-          indi_obj:individual,
-          perfor_obj:performance,
-          self_rating:rating
-
-        }
-      })
-      history('/emp_login');
-      
+   if(individual&&performance&&rating&&objective_no){
+    axios({
+      method: "Post",
+      url: "http://localhost:4000/emp_login",
+      header: "application/json",
+      data: {
+        emp_num: empNumber,
+        obj_no: objective_no,
+        indi_obj: individual,
+        perfor_obj: performance,
+        self_rating: rating,
+      },
+    })
+    alert('data added successfully')
+    
+   }
+   else{
+    alert("Please fill all the fields");
+   }
+      // history("/emp_login");
     } catch (err) {
-      console.log(err.message)
+      console.log(err.message);
     }
+    ClearFunction();
 
+  };
+  const ClearFunction = () => {
+    setObjective_no("");
+    setIndividual("");
+    setPerformance("");
+    setRating("");
   }
 
   return (
     <>
-     <Box>
-      <form className='FormTable'>
-
-     <TextField
-              id="filled-basic"
-              label="emp_num"
-              value={emp_num}
-              variant="filled"onChange={(e)=>{
-                setEmp_num(e.target.value)
-              }}
-              
-            />  <TextField
+      <Box>
+        <form className="FormTable">
+          <TextField
+            id="filled-basic"
+            label="emp_num"
+            value={empNumber}
+            variant="filled"
+            
+          />{" "}
+          <TextField
             id="filled-basic"
             label="objective no."
             variant="filled"
-            value = {objective_no}
-            onChange={(e)=>{
-              setObjective_no(e.target.value)
+            type="number"
+            value={objective_no}
+            onChange={(e) => {
+              setObjective_no(e.target.value);
             }}
-            
-          />  <TextField
-          id="filled-basic"
-          label="Individual Objectives"
-          variant="filled"
-          value={individual}
-          onChange={(e)=>{setIndividual(e.target.value)}}
-          
-        />  <TextField
-        id="filled-basic"
-        label="Performance Objectives"
-        variant="filled"
-        value ={performance}
-        onChange={(e)=>{setPerformance(e.target.value)}}
-        
-      />
-            <TextField
-              id="filled-basic"
-              label="Self rating"
-              variant="filled"
-              value={rating}
-              onChange={(e)=>{
-                setRating(e.target.value)
+          />{" "}
+          <TextField
+            id="filled-basic"
+            label="Individual Objectives"
+            variant="filled"
+            value={individual}
+            onChange={(e) => {
+              setIndividual(e.target.value);
+            }}
+          />{" "}
+          <TextField
+            id="filled-basic"
+            label="Performance Objectives"
+            variant="filled"
+            value={performance}
+            onChange={(e) => {
+              setPerformance(e.target.value);
+            }}
+          />
+          <TextField
+            id="filled-basic"
+            label="Self rating/10"
+            variant="filled"
+            type="number"
+            value={rating}
+            onChange={(e) => {
+              setRating(e.target.value);
+            }}
+          />
+          <div className="ButtonFlex">
+            <Button onClick={()=>{ClearFunction()}}>Clear</Button>
+            <Button
+              onClick={() => {
+                SubmitFunction();
+                console.log(empNumber);
               }}
-              
-            />
-     
-      
-
-<div className='ButtonFlex'>
-<Button>Clear</Button>
-<Button onClick= {()=>{SubmitFunction()}}>Submit</Button>
-</div>
-      </form>
-
-
+            >
+              Submit
+            </Button>
+          </div>
+        </form>
       </Box>
-     
-
-
-   
     </>
-  )
+  );
 }
 
-export default FormTable
+export default memo(FormTable);
