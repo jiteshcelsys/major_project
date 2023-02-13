@@ -1,13 +1,18 @@
-import React from 'react'
+import * as React from 'react';
+import Button from "@mui/material/Button";
+import { contextData } from "../context/contextData";
+import { useContext } from 'react';
 
-function hrform() {
+function Hrform({HrPermission}) {
+const {empNumber,setEmpNumber,empName, setEmpNam}=React.useContext(contextData)
+console.log(empNumber)
+
   return (
     <>
-    <h1>HR </h1>
-     <p>can able to see the  the overall performance table</p> 
-     <p>can allow to see the current field form -to employee</p> 
+    <Button  onClick={()=>{HrPermission(false)}}> allowed </Button>
+    <Button  onClick={()=>{HrPermission(true)}}> Not Allowed </Button>
     </>
   )
 }
 
-export default hrform
+export default Hrform

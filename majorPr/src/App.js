@@ -25,6 +25,7 @@ function App() {
             <Route path="/Manager" element={<Manager />} />   
              <Route path="/HR" element={<HR />} />
              <Route path="/Invalid" element={<Invalid />} />
+             
           </Routes>
         </BrowserRouter>
       </contextData.Provider>

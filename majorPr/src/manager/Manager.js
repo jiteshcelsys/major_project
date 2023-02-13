@@ -10,7 +10,11 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { contextData } from "../context/contextData";
+
 import TextField from '@mui/material/TextField';
+
+
+
 
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -40,6 +44,9 @@ function Manager() {
   const [tableData, setTableData] = React.useState([]);
   const { empNumber, setEmpNumber, empName, setEmpNam } =
     React.useContext(contextData);
+    const customTableContainer={
+      overflowX: "initial"
+    }
   console.log(empNumber);
   const renderData = () => {
     axios({
@@ -77,7 +84,7 @@ function Manager() {
 
   
 const UpdateMgrTable=(emp_num,indi_obj,Input_mgr)=>{
-  console.log(emp_num,indi_obj,Input_mgr)
+  // console.log(emp_num,indi_obj,Input_mgr)
 
   axios({
     method: "Post",
@@ -91,6 +98,16 @@ const UpdateMgrTable=(emp_num,indi_obj,Input_mgr)=>{
       mgr_rating:Input_mgr
       
     }
+  }).then((data)=>{
+    if(data.data[0]?.mgr_rating<10){
+           console.log(data.data[0])
+      setInput_mgr(data.data[0]?.mgr_rating)
+    }
+    else{
+      alert('rating should be less than 10')
+    }
+    
+ console.log(data.data[0]?.mgr_rating)
   })
 }
   
@@ -101,8 +118,8 @@ const UpdateMgrTable=(emp_num,indi_obj,Input_mgr)=>{
       {table ? (
         <div>
           {
-            <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 600 }} aria-label="customized table">
+            <TableContainer component={Paper} sx={{maxHeight:340}} >
+              <Table sx={{ minWidth: 600 }} aria-label="customized table" stickyHeader style={customTableContainer}>
                 <TableHead>
                   <TableRow>
                     <StyledTableCell>Objective Number</StyledTableCell>
@@ -120,10 +137,10 @@ const UpdateMgrTable=(emp_num,indi_obj,Input_mgr)=>{
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {tableData.map((row) => {
+                  {tableData.map((row,index) => {
                     return (
                       <StyledTableRow component="th" scope="row">
-                        <StyledTableCell>{row.obj_no}</StyledTableCell>
+                        <StyledTableCell>{index+1}</StyledTableCell>
                         <StyledTableCell align="right">
                           {row.indi_obj}
                         </StyledTableCell>
@@ -134,7 +151,7 @@ const UpdateMgrTable=(emp_num,indi_obj,Input_mgr)=>{
                           {row.self_rating}
                         </StyledTableCell>
                         <StyledTableCell align="right">
-                        <TextField id="outlined-basic" label="Outlined" variant="outlined"  onChange={(e)=>{setInput_mgr(e.target.value)}}/>
+                        <TextField id="outlined-basic" label="Outlined" variant="outlined"value={Input_mgr}  onChange={(e)=>{setInput_mgr(e.target.value)}}/>
                         </StyledTableCell>
                         <StyledTableCell align="right">
                           <Button onClick={()=>{
@@ -154,7 +171,7 @@ const UpdateMgrTable=(emp_num,indi_obj,Input_mgr)=>{
             }}
             style={{ margin: "auto" }}
           >
-            Add
+           Back
           </Button>
         </div>
       ) : (
@@ -169,16 +186,12 @@ const UpdateMgrTable=(emp_num,indi_obj,Input_mgr)=>{
           >
             Submitted Form{" "}
           </Button>
-          <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 600 }} aria-label="customized table">
+          <TableContainer component={Paper} sx={{maxHeight:340}}>
+              <Table sx={{ maxidth: 300 }} aria-label="customized table" style={customTableContainer}>
                 <TableHead>
                   <TableRow>
                     <StyledTableCell>Employee Number</StyledTableCell>
-                    <StyledTableCell align="right">
-                      Individual Objective
-                    </StyledTableCell>
-                    
-                    
+                    <StyledTableCell>Employee Name</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -187,10 +200,9 @@ const UpdateMgrTable=(emp_num,indi_obj,Input_mgr)=>{
                       <StyledTableRow component="th" scope="row" onClick={() => {
                         OpenTable(row.emp_num);
                       }}>
-                        <StyledTableCell>{row.emp_num}</StyledTableCell>
-                        <StyledTableCell align="right">
-                          {row.indi_obj}
-                        </StyledTableCell>
+                        <StyledTableCell>{row.emp_num}</StyledTableCell> 
+                        <StyledTableCell>{row.first_name}</StyledTableCell> 
+                       
                       </StyledTableRow>
                     );
                   })}
