@@ -1,10 +1,9 @@
 import "./App.css";
 import React from 'react'
-import UserDetails from "./employee/UserDetails";
-import Login from "./employee/Login";
+import Signup from "./employee/Signup";
 import Navbar from "./employee/Navbar";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AfterLogin from "./employee/AfterLogin";
+import Employee from "./employee/Employee";
 import {contextData} from "./context/contextData";
 import Manager from "./manager/Manager"
 import HR from "./HR/Hrform";
@@ -19,12 +18,12 @@ function App() {
         <BrowserRouter>
           <Navbar/>
           <Routes>
-            <Route path="/userDetails" element={<UserDetails/>} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/Employee" element={<AfterLogin />} />
+            <Route path="/Signup" element={<Signup/>} />
+            <Route path="/Employee" element={<Employee />} />
             <Route path="/Manager" element={<Manager />} />   
              <Route path="/HR" element={<HR />} />
              <Route path="/Invalid" element={<Invalid />} />
+          
              
           </Routes>
         </BrowserRouter>

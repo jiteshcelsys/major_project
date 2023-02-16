@@ -54,7 +54,7 @@ BootstrapDialogTitle.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-export default function CustomizedDialogs() {
+export default function SignUp() {
   const history = useNavigate();
   const [open, setOpen] = React.useState(true);
   const [emp_num, setEmp_num] = React.useState();
@@ -114,7 +114,7 @@ export default function CustomizedDialogs() {
     margin: "auto",
     paddingTop: "10px",
   };
-
+console.log('Signup Component')
   return (
     <Box
       sx={{
@@ -172,7 +172,7 @@ export default function CustomizedDialogs() {
 
             <Box sx={Role}>
               <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Age</InputLabel>
+                <InputLabel id="demo-simple-select-label">Role</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
