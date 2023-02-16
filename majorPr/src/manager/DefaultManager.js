@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
@@ -8,7 +8,14 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 const HybridStyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -36,7 +43,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:last-child td, &:last-child th": {
     border: 0,
   },
-  
 }));
 
 const HybridStyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -54,66 +60,72 @@ const HybridStyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function DefaultManager() {
+  const [open, setOpen] = React.useState(false);
+  const [managerData, setManagerData] = React.useState([]);
+  const [name, setName] = React.useState("");
+  const [number, setNumber] = React.useState("");
+  const [individual, setIndividual] = React.useState("");
 
-    const [handleIndividual, setHandleIndividual] = React.useState(false);
-    const [render, setRender]= React.useState([]);
-    const renderData =()=>{
-      axios({
-        method: "GET",
-        url: "http://localhost:4000/manageRender",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data:{
+  const fetch_managerTable = () => {
+    axios({
+      method: "get",
+      url: "http://localhost:4000/managertable",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((data) => {
+      setManagerData(data.data);
 
-        }
+      console.log(managerData);
+      return;
+    });
+  };
+  React.useEffect(() => {
+    fetch_managerTable();
+  }, []);
+  const handleClose = () => {
+    setOpen(false);
+    setIndividual('');
+    setNumber('');
+    setName('')
+  };
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+  const submitIndividual=()=>{
+     axios({
+      method: "post",
+      url: "http://localhost:4000/InsertIndividual",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {
+        first_name: name,
+        emp_num: number,
+        indi_obj:individual
+      },
+    });
+    handleClose();
 
-      })
-    }
+    
+  }
+  const InsertIndividual = (number, name) => {
+    setName(name);
+    setNumber(number);
+    handleClickOpen();
+   
+  };
+  const clearFunction = () => {
+    setName("");
+    setNumber("");
+  };
 
-
-    const customTableContainer = {
+  const customTableContainer = {
     overflowX: "initial",
   };
-  return (
-    
-      <>
-        <h1 style={{ textAlign: "center" }}>Manager Form</h1>
-        <h3>Submitted Form</h3>
 
-        <TableContainer component={Paper} sx={{ maxHeight: 340 }}>
-          <Table
-            sx={{ maxidth: 300 }}
-            aria-label="customized table"
-            style={customTableContainer}
-          >
-            <TableHead>
-              <TableRow>
-                <HybridStyledTableCell>Employee Number</HybridStyledTableCell>
-                <HybridStyledTableCell>Employee Name</HybridStyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {render.map((row) => {
-                return (
-                  <HybridStyledTableRow
-                    component="th"
-                    scope="row"
-                    onClick={() => {
-                      OpenTable(row.emp_num);
-                    }}
-                  >
-                    <HybridStyledTableCell style={hoverStyle}>
-                      {row.emp_num}
-                    </HybridStyledTableCell>
-                    <HybridStyledTableCell>{row.first_name}</HybridStyledTableCell>
-                  </HybridStyledTableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <div>
+  return (
+    <>
       <h3>Individual Objective </h3>
       <TableContainer component={Paper} sx={{ maxHeight: 340 }}>
         <Table
@@ -124,34 +136,67 @@ function DefaultManager() {
         >
           <TableHead>
             <TableRow>
-              <StyledTableCell>
-              Serial No.
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                First Name
-              </StyledTableCell>
-              <StyledTableCell align="right">
-              Role
-              </StyledTableCell>
-              <StyledTableCell align="right">
-              Assign
-              </StyledTableCell>
+              <StyledTableCell>Serial No.</StyledTableCell>
+              <StyledTableCell align="right">First Name</StyledTableCell>
+              <StyledTableCell align="right">Role</StyledTableCell>
+              <StyledTableCell align="right">Operation</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {managerData.map((row, index) => {
-             
               return (
                 <StyledTableRow component="th" scope="row">
                   <StyledTableCell>{index + 1}</StyledTableCell>
                   <StyledTableCell align="right">
                     {row.first_name}
                   </StyledTableCell>
+                  <StyledTableCell align="right">{row.role_}</StyledTableCell>
                   <StyledTableCell align="right">
-                    {row.role_}
-                  </StyledTableCell>
-                  <StyledTableCell align="right">
-                    <Button >Add</Button>
+                    {/* <Button  disabled={(row.role_==='Manager'||row.role_==='HR')?true:null} >
+                    Add </Button> */}
+                    <Button variant="outlined"   disabled={(row.role_==='Manager'||row.role_==='HR')?true:null}onClick={()=>{InsertIndividual(row.emp_num,row.first_name)}}>
+                      Add 
+                    </Button>
+                    <Dialog open={open} onClose={handleClose}>
+                      <DialogTitle> Individual Objective</DialogTitle>
+                      <DialogContent>
+                        <DialogContentText></DialogContentText>
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="name"
+                          value={name}
+                          label="EMployee Name "
+                          type="email"
+                          fullWidth
+                          variant="standard"
+                        />
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="name"
+                          label="Employee Number"
+                          type="number"
+                          value={number}
+                          fullWidth
+                          variant="standard"
+                        />
+                        <TextField
+                          autoFocus
+                          margin="dense"
+                          id="name"
+                          label="Individual "
+                          type="email"
+                          fullWidth
+                          onChange={(e)=>{setIndividual(e.target.value)}}
+                          variant="standard"
+                        />
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleClose}>Cancel</Button>
+                        <Button onClick={submitIndividual}>Submit</Button>
+                      </DialogActions>
+                    </Dialog>
                   </StyledTableCell>
                 </StyledTableRow>
               );
@@ -159,74 +204,8 @@ function DefaultManager() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Button variant="outlined" onClick={handleClickOpenIndividual}>
-      Add Individual
-    </Button>
-    <Dialog open={handleIndividual} onClose={handleCloseIndividual}>
-      <DialogTitle> Individual Objective</DialogTitle>
-      <DialogContent>
-        <DialogContentText>
-         
-        </DialogContentText>
-        <TextField
-         autoFocus
-         margin="dense"
-         id="name"
-         label="EMployee Name "
-         type="email"
-         fullWidth
-         variant="standard"
-       
-       />
-        <TextField
-         autoFocus
-         margin="dense"
-         id="name"
-         label="Employee Number"
-         type="email"
-         fullWidth
-         variant="standard"
-       
-       />
-        <TextField
-          autoFocus
-          margin="dense"
-          id="name"
-          label="Individual "
-          type="email"
-          fullWidth
-          variant="standard"
-          onChange={(e) => {
-            setIndividual(e.target.value);
-          }}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseIndividual}>Cancel</Button>
-        <Button onClick={InsertIndividual}>SUbmit</Button>
-      </DialogActions>
-    </Dialog>
-      
-    </div>
-
-        {/* {render.map((value, index) => {
-            return (
-              <>
-                <Button
-                  onClick={() => {
-                    OpenTable(value.emp_num);
-                  }}
-                >
-                  {value.first_name}
-                </Button>
-                <h4>{value.indi_obj}</h4>
-                <h4>Self_rating -{value.self_rating}</h4>
-              </>
-            );
-          })} */}
-      </>
-    
-  )
+    </>
+  );
 }
 
-export default DefaultManager
+export default DefaultManager;

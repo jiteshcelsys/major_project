@@ -18,6 +18,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
 import TextField from "@mui/material/TextField";
+import DefaultManager from "./DefaultManager";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -36,7 +37,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:last-child td, &:last-child th": {
     border: 0,
   },
-  
 }));
 const HybridStyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -67,18 +67,11 @@ function Manager() {
   const [table, setTable] = React.useState(false);
   const [Input_mgr, setInput_mgr] = React.useState("");
   const [tableData, setTableData] = React.useState([]);
-  const [individual, setIndividual] = React.useState("");
+
   const [open, setOpen] = React.useState(false);
   const { empNumber, setEmpNumber, empName, setEmpName } =
     React.useContext(contextData);
   const [managerData, setManagerData] = React.useState([]);
-  const [handleIndividual, setHandleIndividual] = React.useState(false)
-  const handleCloseIndividual=()=>{
-    setHandleIndividual(false)
-  }
-  const handleClickOpenIndividual=()=>{
-    setHandleIndividual(true)
-  }
   
 
   const localStorageEmpName = localStorage.getItem("EmpName");
@@ -107,11 +100,14 @@ function Manager() {
         "Content-Type": "application/json",
       },
     }).then((data) => {
-      console.log(data);
       setRender(data.data);
+  
     });
   };
-  const OpenTable = async (emp_num) => {
+  const OpenTable = async (emp_num,first_name) => {
+    localStorage.setItem('Labour_id',emp_num)
+    localStorage.setItem('Labour_first_name',first_name)
+    console.log(emp_num,first_name);
     await axios({
       method: "Post",
       url: "http://localhost:4000/manager/add",
@@ -181,35 +177,26 @@ function Manager() {
     renderData();
   }, []);
 
-  const InsertIndividual = async () => {
-    await axios({
-      method: "Post",
-      url: "http://localhost:4000/managertable/insert",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: {
-        indi_obj: individual,
-      },
-    }).then((data) => {
-      console.log(data.data);
-    });
-    fetch_managerTable();
-    handleCloseIndividual();
-  };
-  const hoverStyle = {
-    "& .MuiOutlinedInput-root:hover": {
-      color: "#red",
-      // color:"white"
-    },
-  };
+ 
+  const EmpNameStyle={
+    color:'#181823',
+    display: 'flex',
+    justifyContent: 'space-around',
+   
 
-  //  fetch_managerTable();
+  }
+
   return (
     <>
       <h1>Manager {empName}</h1>
+      
       {table ? (
         <>
+        <div style={EmpNameStyle}
+>
+        <h2 >{localStorage.getItem('Labour_first_name')}</h2>
+        <h2 >{localStorage.getItem('Labour_id')}</h2>
+        </div>
           <div>
             {
               <TableContainer component={Paper} sx={{ maxHeight: 340 }}>
@@ -366,119 +353,117 @@ function Manager() {
                       component="th"
                       scope="row"
                       onClick={() => {
-                        OpenTable(row.emp_num);
+                        OpenTable(row.emp_num,row.first_name);
                       }}
                     >
-                      <HybridStyledTableCell style={hoverStyle}>
+                      <HybridStyledTableCell >
                         {row.emp_num}
                       </HybridStyledTableCell>
-                      <HybridStyledTableCell>{row.first_name}</HybridStyledTableCell>
+                      <HybridStyledTableCell>
+                        {row.first_name}
+                      </HybridStyledTableCell>
                     </HybridStyledTableRow>
                   );
                 })}
               </TableBody>
             </Table>
           </TableContainer>
-          <div>
-        <h3>Individual Objective </h3>
-        <TableContainer component={Paper} sx={{ maxHeight: 340 }}>
-          <Table
-            sx={{ minWidth: 600 }}
-            aria-label="customized table"
-            stickyHeader
-            style={customTableContainer}
-          >
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>
-                Serial No.
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                  First Name
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                Role
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                Assign
-                </StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {managerData.map((row, index) => {
-               
-                return (
-                  <StyledTableRow component="th" scope="row">
-                    <StyledTableCell>{index + 1}</StyledTableCell>
-                    <StyledTableCell align="right">
-                      {row.first_name}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      {row.role_}
-                    </StyledTableCell>
-                    <StyledTableCell align="right">
-                      <Button disabled={(row.role_==='Manager'||row.role_==='HR')?true:null} onClick={()=>{
-                        console.log(row.first_name)
-                      }}>Add</Button>
-                    </StyledTableCell>
-                  </StyledTableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <Button variant="outlined" onClick={handleClickOpenIndividual}>
-        Add Individual
-      </Button>
-      <Dialog open={handleIndividual} onClose={handleCloseIndividual}>
-        <DialogTitle> Individual Objective</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-           
-          </DialogContentText>
-          <TextField
-           autoFocus
-           margin="dense"
-           id="name"
-           label="EMployee Name "
-           type="email"
-           fullWidth
-           variant="standard"
-         
-         />
-          <TextField
-           autoFocus
-           margin="dense"
-           id="name"
-           label="Employee Number"
-           type="email"
-           fullWidth
-           variant="standard"
-         
-         />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Individual "
-            type="email"
-            fullWidth
-            variant="standard"
-            onChange={(e) => {
-              setIndividual(e.target.value);
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseIndividual}>Cancel</Button>
-          <Button onClick={InsertIndividual}>SUbmit</Button>
-        </DialogActions>
-      </Dialog>
-        
-      </div>
+          {/* <div>
+            <h3>Individual Objective </h3>
+            <TableContainer component={Paper} sx={{ maxHeight: 340 }}>
+              <Table
+                sx={{ minWidth: 600 }}
+                aria-label="customized table"
+                stickyHeader
+                style={customTableContainer}
+              >
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Serial No.</StyledTableCell>
+                    <StyledTableCell align="right">First Name</StyledTableCell>
+                    <StyledTableCell align="right">Role</StyledTableCell>
+                    <StyledTableCell align="right">Assign</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {managerData.map((row, index) => {
+                    return (
+                      <StyledTableRow component="th" scope="row">
+                        <StyledTableCell>{index + 1}</StyledTableCell>
+                        <StyledTableCell align="right">
+                          {row.first_name}
+                        </StyledTableCell>
+                        <StyledTableCell align="right">
+                          {row.role_}
+                        </StyledTableCell>
+                        <StyledTableCell align="right">
+                          <Button
+                            disabled={
+                              row.role_ === "Manager" || row.role_ === "HR"
+                                ? true
+                                : null
+                            }
+                            onClick={() => {
+                              console.log(row.first_name);
+                            }}
+                          >
+                            Add
+                          </Button>
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <Button variant="outlined" onClick={handleClickOpenIndividual}>
+              Add Individual
+            </Button>
+            <Dialog open={handleIndividual} onClose={handleCloseIndividual}>
+              <DialogTitle> Individual Objective</DialogTitle>
+              <DialogContent>
+                <DialogContentText></DialogContentText>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="EMployee Name "
+                  type="email"
+                  fullWidth
+                  variant="standard"
+                />
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Employee Number"
+                  type="email"
+                  fullWidth
+                  variant="standard"
+                />
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="name"
+                  label="Individual "
+                  type="email"
+                  fullWidth
+                  variant="standard"
+                  onChange={(e) => {
+                    setIndividual(e.target.value);
+                  }}
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseIndividual}>Cancel</Button>
+                <Button onClick={InsertIndividual}>SUbmit</Button>
+              </DialogActions>
+            </Dialog>
+          </div> */}
+      <DefaultManager />
         </>
       )}
-      
+
     </>
   );
 }
