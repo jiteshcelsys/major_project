@@ -3,7 +3,6 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import Signup from "./Signup";
 import { NavLink } from "react-router-dom";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -15,15 +14,15 @@ import axios from "axios";
 import { contextData } from "../context/contextData";
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
+import celestial from './celestial.webp'
 
 export default function Navbar() {
   const [open, setOpen] = React.useState(false);
-  const { empNumber, setEmpNumber, empName, setEmpName } =
+  const { empName, setEmpName } =
     React.useContext(contextData);
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const history = useNavigate();
-  
 
   const handleClickOpen = () => {
     history("/");
@@ -48,31 +47,22 @@ export default function Navbar() {
           return data.data;
         })
         .then((data) => {
-          console.log(data)
-          if(data.sucess===false){
+          console.log(data);
+          if (data.sucess === false) {
             history("/Invalid");
-            return
+            return;
           }
-          console.log(data.data[0]?.emp_num)
-          localStorage.setItem("EmpName",`${data.data[0]?.first_name}`)
-          localStorage.setItem("EmpNumber",`${data.data[0]?.emp_num}`)
-
-          setEmpName(data.data[0]?.first_name);
+          console.log(data.data[0]?.emp_num);
+          localStorage.setItem("EmpName", `${data.data[0]?.first_name}`);
+          localStorage.setItem("EmpNumber", `${data.data[0]?.emp_num}`);
           console.log(data.data[0]?.first_name);
-          // console.log(data.data[0]?.role_)
           if (data.sucess === true) {
-            setEmpNumber(data.data[0]?.emp_num);
             console.log(data.data[0]?.role_);
             history(`/${data.data[0]?.role_}`);
-          } else {
-     
           }
-          console.log(data.sucess);
         });
     } catch (err) {
       console.log(err.message);
-    
-
     }
   };
   const SubmitFunction = () => {
@@ -83,32 +73,46 @@ export default function Navbar() {
     handleClose();
   };
 
-  const spacing = { margin: "5px" };
+  const spacing = { 
+    paddingTop:'5px'
+  };
   const navlink = {
     textDecoration: "none",
     marginLeft: "10px",
     textAlign: "center",
   };
-  const LButton = 
-    { color: "black", marginLeft: "auto" }
+  const LButton = { 
+    color: "black",
+     marginLeft: "auto" 
+    };
 
-
-  
-  const localStorageEmpName = localStorage.getItem("EmpName"); 
-  setEmpName(localStorageEmpName)
-  const LogoutFunc=()=>{
+  const localStorageEmpName = localStorage.getItem("EmpName");
+  setEmpName(localStorageEmpName);
+  const LogoutFunc = () => {
     localStorage.removeItem("EmpName");
     localStorage.removeItem("EmpNumber");
     history("/");
-
+  };
+  const appBar ={
+    backgroundColor: "#BFDCE5",
+    color: "black",
   }
+  const styleTitle={
+    marginLeft:'10px'
+  }
+  const dialogFormStyle={
+    display:'flex',
+    flexDirection:'column',
+  }
+
 
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar variant="dense">
-          <h3>Appraisal </h3>
+        <Toolbar variant="dense" style={appBar}>
+          <img src={celestial} width='100px'alt='img'/>
+          <h3  style={styleTitle}>Appraisal </h3>
           <IconButton
             edge="start"
             color="inherit"
@@ -116,15 +120,21 @@ export default function Navbar() {
             sx={{ mr: 2 }}
           ></IconButton>
 
-          {empName?<Button onClick={LogoutFunc} style={LButton}>Logout</Button>:<Button
-            variant="outlined"
-            style={LButton}
-            onClick={() => {
-              handleClickOpen();
-            }}
-          >
-            Login
-          </Button>}
+          {empName ? (
+            <Button onClick={LogoutFunc} style={LButton}>
+              Logout
+            </Button>
+          ) : (
+            <Button
+              variant="outlined"
+              style={LButton}
+              onClick={() => {
+                handleClickOpen();
+              }}
+            >
+              Login
+            </Button>
+          )}
           <div>
             <Dialog
               open={open}
@@ -132,9 +142,16 @@ export default function Navbar() {
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
             >
-              <DialogTitle id="alert-dialog-title">Login Form</DialogTitle>
-              <DialogContent>
-                <DialogContentText id="alert-dialog-description">
+             
+             
+                
+                <DialogTitle 
+                id="alert-dialog-title"
+              >
+                <img src={celestial} width='100px'alt='img'/>
+               </DialogTitle>
+              <DialogContent >
+                <DialogContentText id="alert-dialog-description" style={dialogFormStyle}>
                   <TextField
                     id="filled-basic"
                     label="email"

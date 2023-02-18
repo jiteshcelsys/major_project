@@ -17,15 +17,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-const HybridStyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
-  },
-}));
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -45,19 +37,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-const HybridStyledTableRow = styled(TableRow)(({ theme }) => ({
-  "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
-  },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
-  },
-  "&:hover td": {
-    backgroundColor: "#635985",
-    color: "#E9F8F9",
-  },
-}));
+
 
 function DefaultManager() {
   const [open, setOpen] = React.useState(false);
@@ -65,6 +45,7 @@ function DefaultManager() {
   const [name, setName] = React.useState("");
   const [number, setNumber] = React.useState("");
   const [individual, setIndividual] = React.useState("");
+  const [Previousindividual, setPreviousIndividual] = React.useState([]);
 
   const fetch_managerTable = () => {
     axios({
@@ -110,19 +91,42 @@ function DefaultManager() {
     
   }
   const InsertIndividual = (number, name) => {
+    console.log(number, name);
     setName(name);
     setNumber(number);
     handleClickOpen();
+    axios({
+      url: "http://localhost:4000/fetch/indi_obj",
+      method: "Post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data:{
+        emp_num:number
+      }
+    }).then((data)=>{
+      setPreviousIndividual(data.data)
+      console.log(data.data)
+    })
    
   };
-  const clearFunction = () => {
-    setName("");
-    setNumber("");
-  };
+ 
 
   const customTableContainer = {
     overflowX: "initial",
   };
+  const PreviousindividualStyle={
+    margin:0,
+    padding:0,
+    display:'flex',
+    width:'60%',
+    height:'50%',
+    gap:'10px'
+  }
+  const liStyle={
+    color:'#3E54AC',
+    listStyleType:'none'
+  }
 
   return (
     <>
@@ -145,7 +149,7 @@ function DefaultManager() {
           <TableBody>
             {managerData.map((row, index) => {
               return (
-                <StyledTableRow component="th" scope="row">
+                <StyledTableRow component="th" scope="row" key={index}>
                   <StyledTableCell>{index + 1}</StyledTableCell>
                   <StyledTableCell align="right">
                     {row.first_name}
@@ -191,6 +195,12 @@ function DefaultManager() {
                           onChange={(e)=>{setIndividual(e.target.value)}}
                           variant="standard"
                         />
+                        <h4>Given Objective</h4>
+                        <ul style={PreviousindividualStyle}>
+                        {Previousindividual.map((val,index)=>
+                          <li style={liStyle} key={index}>{val.indi_obj}</li>
+                        )}
+                        </ul>
                       </DialogContent>
                       <DialogActions>
                         <Button onClick={handleClose}>Cancel</Button>

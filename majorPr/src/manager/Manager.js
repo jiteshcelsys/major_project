@@ -10,15 +10,10 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { contextData } from "../context/contextData";
-
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-
 import TextField from "@mui/material/TextField";
 import DefaultManager from "./DefaultManager";
+import Behaviour from './Behaviour';
+
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -68,7 +63,6 @@ function Manager() {
   const [Input_mgr, setInput_mgr] = React.useState("");
   const [tableData, setTableData] = React.useState([]);
 
-  const [open, setOpen] = React.useState(false);
   const { empNumber, setEmpNumber, empName, setEmpName } =
     React.useContext(contextData);
   const [managerData, setManagerData] = React.useState([]);
@@ -80,19 +74,11 @@ function Manager() {
   setEmpNumber(localStorageEmpNumber);
   console.log(localStorageEmpName, localStorageEmpNumber);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   const customTableContainer = {
     overflowX: "initial",
   };
   console.log(empNumber);
-  const renderData = () => {
+  const OnclickRow = () => {
     axios({
       method: "get",
       url: "http://localhost:4000/manager",
@@ -129,6 +115,7 @@ function Manager() {
   };
   console.log(tableData);
 
+  //correct
   const UpdateMgrTable = (emp_num, indi_obj, Input_mgr) => {
     // console.log(emp_num,indi_obj,Input_mgr)
 
@@ -174,15 +161,19 @@ function Manager() {
   };
   React.useEffect(() => {
     fetch_managerTable();
-    renderData();
+    OnclickRow();
   }, []);
 
  
   const EmpNameStyle={
-    color:'#181823',
+    color:'#DEFCF9',
     display: 'flex',
     justifyContent: 'space-around',
-   
+    position:'sticky',
+    top:'0px',
+    backgroundColor:'#362FD9',
+    zIndex:5
+
 
   }
 
@@ -196,9 +187,19 @@ function Manager() {
 >
         <h2 >{localStorage.getItem('Labour_first_name')}</h2>
         <h2 >{localStorage.getItem('Labour_id')}</h2>
+        <Button
+              onClick={() => {
+                ManagerAdd();
+              }}
+              style={{color:'#DEFCF9'}}
+            >
+             Home Page
+            </Button>
+       
         </div>
           <div>
             {
+              
               <TableContainer component={Paper} sx={{ maxHeight: 340 }}>
                 <Table
                   sx={{ minWidth: 600 }}
@@ -227,7 +228,7 @@ function Manager() {
                   <TableBody>
                     {tableData.map((row, index) => {
                       return (
-                        <StyledTableRow component="th" scope="row">
+                        <StyledTableRow component="th" scope="row" key={index}>
                           <StyledTableCell>{index + 1}</StyledTableCell>
                           <StyledTableCell align="right">
                             {row.indi_obj}
@@ -269,65 +270,9 @@ function Manager() {
                 </Table>
               </TableContainer>
             }
-            <Button
-              onClick={() => {
-                ManagerAdd();
-              }}
-              style={{ margin: "auto" }}
-            >
-              Back
-            </Button>
+            
           </div>
-
-          <h1>Behaviour Attribute</h1>
-          <TableContainer component={Paper} sx={{ maxHeight: 340 }}>
-            <Table
-              sx={{ minWidth: 600 }}
-              aria-label="customized table"
-              stickyHeader
-              style={customTableContainer}
-            >
-              <TableHead>
-                <TableRow>
-                  <StyledTableCell>Behaviour Attribute</StyledTableCell>
-                  <StyledTableCell align="right">Description</StyledTableCell>
-                  <StyledTableCell align="right">
-                    Manager Rating
-                  </StyledTableCell>
-                  <StyledTableCell align="right">Operation</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <div>
-                  <Button variant="outlined" onClick={handleClickOpen}>
-                    Add Attribute
-                  </Button>
-                  <Dialog
-                    open={open}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
-                  >
-                    <DialogTitle id="alert-dialog-title">
-                      Behaviour Attribute
-                    </DialogTitle>
-                    <DialogContent>
-                      <DialogContentText>
-                        <TextField label="Behaviour Attr" />
-                        <TextField label="Description" />
-                        <TextField label="Manager_Rating/10" />
-                      </DialogContentText>
-                    </DialogContent>
-                    <DialogActions>
-                      <Button onClick={handleClose}>Close</Button>
-                      <Button onClick={handleClose} autoFocus>
-                        Submit
-                      </Button>
-                    </DialogActions>
-                  </Dialog>
-                </div>
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Behaviour/>
         </>
       ) : (
         <>
@@ -347,7 +292,7 @@ function Manager() {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {render.map((row) => {
+                {render.map((row,index) => {
                   return (
                     <HybridStyledTableRow
                       component="th"
@@ -355,6 +300,7 @@ function Manager() {
                       onClick={() => {
                         OpenTable(row.emp_num,row.first_name);
                       }}
+                      key={index}
                     >
                       <HybridStyledTableCell >
                         {row.emp_num}
@@ -368,99 +314,8 @@ function Manager() {
               </TableBody>
             </Table>
           </TableContainer>
-          {/* <div>
-            <h3>Individual Objective </h3>
-            <TableContainer component={Paper} sx={{ maxHeight: 340 }}>
-              <Table
-                sx={{ minWidth: 600 }}
-                aria-label="customized table"
-                stickyHeader
-                style={customTableContainer}
-              >
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell>Serial No.</StyledTableCell>
-                    <StyledTableCell align="right">First Name</StyledTableCell>
-                    <StyledTableCell align="right">Role</StyledTableCell>
-                    <StyledTableCell align="right">Assign</StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {managerData.map((row, index) => {
-                    return (
-                      <StyledTableRow component="th" scope="row">
-                        <StyledTableCell>{index + 1}</StyledTableCell>
-                        <StyledTableCell align="right">
-                          {row.first_name}
-                        </StyledTableCell>
-                        <StyledTableCell align="right">
-                          {row.role_}
-                        </StyledTableCell>
-                        <StyledTableCell align="right">
-                          <Button
-                            disabled={
-                              row.role_ === "Manager" || row.role_ === "HR"
-                                ? true
-                                : null
-                            }
-                            onClick={() => {
-                              console.log(row.first_name);
-                            }}
-                          >
-                            Add
-                          </Button>
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <Button variant="outlined" onClick={handleClickOpenIndividual}>
-              Add Individual
-            </Button>
-            <Dialog open={handleIndividual} onClose={handleCloseIndividual}>
-              <DialogTitle> Individual Objective</DialogTitle>
-              <DialogContent>
-                <DialogContentText></DialogContentText>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  label="EMployee Name "
-                  type="email"
-                  fullWidth
-                  variant="standard"
-                />
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  label="Employee Number"
-                  type="email"
-                  fullWidth
-                  variant="standard"
-                />
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  id="name"
-                  label="Individual "
-                  type="email"
-                  fullWidth
-                  variant="standard"
-                  onChange={(e) => {
-                    setIndividual(e.target.value);
-                  }}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleCloseIndividual}>Cancel</Button>
-                <Button onClick={InsertIndividual}>SUbmit</Button>
-              </DialogActions>
-            </Dialog>
-          </div> */}
       <DefaultManager />
+    
         </>
       )}
 

@@ -60,9 +60,9 @@ const useStyles = makeStyles({
   },
 });
 
-function AfterLogin({ name }) {
+function AfterLogin() {
   const classes = useStyles();
-  const [render, setRender] = React.useState(false);
+  
 
   const { empNumber, setEmpNumber, empName, setEmpName } =
     React.useContext(contextData);
@@ -110,7 +110,7 @@ function AfterLogin({ name }) {
           },
         });
       } else {
-        if ((rating) => 11) {
+        if (rating>11) {
           alert("rating must be less than 10");
           return;
         }
@@ -125,8 +125,6 @@ function AfterLogin({ name }) {
     ClearFunction();
   };
   
-
-  //for getting the managertable and setting the data
   const PreviousFormClick = async () => {
     console.log("previous form clicked");
     await axios({
@@ -138,14 +136,27 @@ function AfterLogin({ name }) {
 
       setData(data.data);
     });
-    setRender(true);
+ 
   };
+
+  //for getting the managertable and setting the data
+ 
   React.useEffect(() => {
-    PreviousFormClick();
+    const NumberEmp =localStorage.getItem('EmpNumber');
+      axios({
+      method: "post",
+      url: "http://localhost:4000/PreviousFormClick",
+      data: { emp_num: NumberEmp },
+    }).then((data) => {
+      console.log(data.data);
+
+      setData(data.data);
+    });
+   
   }, [])
 
-  const EditFunc = (indi_obj) => {
-    console.log(indi_obj);
+  const EditFunc = (indi_obj,self_rating) => {
+    console.log(indi_obj,self_rating);
     // ClearFunction();
     setIndividual(indi_obj);
     // setPerformance(performance)
@@ -157,16 +168,6 @@ function AfterLogin({ name }) {
     setIndividual(indi_obj);
     setPerformance(perfor_obj);
     setRating(self_rating);
-    // await axios({
-    //   method: "post",
-    //   url: "http://localhost:4000/update_emp_login",
-    //   data: {
-    //     emp_num: empNumber,
-    //     indi_obj: indi_obj,
-    //     perfor_obj: perfor_obj,
-    //     self_rating: self_rating,
-    //   },
-    // });
     handleClickOpen();
   };
   const updateExistingData = async () => {
@@ -192,7 +193,6 @@ function AfterLogin({ name }) {
     handleCloseButton();
     console.log("updated data is clicked");
   };
-  // console.log(data[0]?.self_rating)
   return (
     <>
       <div className="ButtonFlex">
@@ -232,7 +232,7 @@ function AfterLogin({ name }) {
                 {data.map((row, index) => {
                   console.log(row.perfor_obj);
                   return (
-                    <StyledTableRow component="th" scope="row">
+                    <StyledTableRow component="th" scope="row" key ={index}>
                       <StyledTableCell>{index + 1}</StyledTableCell>
                       <StyledTableCell align="right">
                         {row.indi_obj}
@@ -265,7 +265,7 @@ function AfterLogin({ name }) {
                           <Button
                             variant="outlined"
                             onClick={() => {
-                              EditFunc(row.indi_obj);
+                              EditFunc(row.indi_obj,row.self_rating);
                             }}
                           >
                             {" "}
