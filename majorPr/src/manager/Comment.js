@@ -59,7 +59,6 @@ function Comment() {
       setKeepDoing("");
       setStart("");
       setStop("");
-      // fetchComment();
       setOpen(false);
     }
   };
@@ -97,7 +96,7 @@ function Comment() {
             keepDoing: keepDoing,
             start: start,
             stop: stop,
-          },
+          }
         }).then((response) => {
           setCommentArray(response.data);
         });

@@ -62,8 +62,6 @@ const useStyles = makeStyles({
 
 function AfterLogin() {
   const classes = useStyles();
-  
-
   const { empNumber, setEmpNumber, empName, setEmpName } =
     React.useContext(contextData);
   const [data, setData] = React.useState([]);
@@ -73,14 +71,26 @@ function AfterLogin() {
   const [performance, setPerformance] = React.useState("");
   const [rating, setRating] = React.useState();
   const localStorageEmpName = localStorage.getItem("EmpName");
+  const PreviousFormClick = async () => {
+    console.log("previous form clicked");
+    await axios({
+      method: "post",
+      url: "http://localhost:4000/PreviousFormClick",
+      data: {
+         emp_num: empNumber 
+        },
+    }).then((data) => {
+      console.log(data.data);
+
+      setData(data.data);
+    });
+ 
+  };
 
   const localStorageEmpNumber = localStorage.getItem("EmpNumber");
   setEmpName(localStorageEmpName);
   setEmpNumber(localStorageEmpNumber);
   console.log(localStorageEmpName, localStorageEmpNumber);
-  // console.log(empNumber);
-  React.useEffect(() => {}, []);
-
   const ClearFunction = () => {
     setIndividual("");
     setPerformance("");
@@ -91,56 +101,11 @@ function AfterLogin() {
     setOpen(true);
   };
   const handleCloseButton = () => {
+    
     setOpen(false);
     ClearFunction();
   };
-  const SubmitFunction = async () => {
-    try {
-      console.log(performance, individual, rating);
-      if (individual && performance && rating < 10) {
-        await axios({
-          method: "Post",
-          url: "http://localhost:4000/emp_loginupdate",
-          header: "application/json",
-          data: {
-            emp_num: empNumber,
-            indi_obj: individual,
-            perfor_obj: performance,
-            self_rating: rating,
-          },
-        });
-      } else {
-        if (rating>11) {
-          alert("rating must be less than 10");
-          return;
-        }
-        alert("Please fill all the fields");
-        return;
-      }
 
-      // history("/emp_login");
-    } catch (err) {
-      console.log(err.message);
-    }
-    ClearFunction();
-  };
-  
-  const PreviousFormClick = async () => {
-    console.log("previous form clicked");
-    await axios({
-      method: "post",
-      url: "http://localhost:4000/PreviousFormClick",
-      data: { emp_num: empNumber },
-    }).then((data) => {
-      console.log(data.data);
-
-      setData(data.data);
-    });
- 
-  };
-
-  //for getting the managertable and setting the data
- 
   React.useEffect(() => {
     const NumberEmp =localStorage.getItem('EmpNumber');
       axios({
@@ -157,10 +122,7 @@ function AfterLogin() {
 
   const EditFunc = (indi_obj,self_rating) => {
     console.log(indi_obj,self_rating);
-    // ClearFunction();
     setIndividual(indi_obj);
-    // setPerformance(performance)
-    // console.log(individual);
     handleClickOpen();
   };
   const UpdateEmpLogin = async (indi_obj, perfor_obj, self_rating) => {
@@ -172,7 +134,7 @@ function AfterLogin() {
   };
   const updateExistingData = async () => {
     try {
-      if (empNumber && individual && performance && rating) {
+      if (empNumber && individual && performance && rating ) {
         await axios({
           method: "post",
           url: "http://localhost:4000/update_emp_login",
@@ -185,6 +147,8 @@ function AfterLogin() {
         });
       } else {
         alert("performance or self_rating need to be added");
+        return false;
+        
       }
     } catch (error) {
       console.log(error.message);
@@ -316,6 +280,7 @@ function AfterLogin() {
                                   <TextField
                                     id="filled-basic"
                                     label="Self rating/10"
+                                    type='number'
                                     variant="filled"
                                     value={rating}
                                     onChange={(e) => {
@@ -335,10 +300,7 @@ function AfterLogin() {
                                   </Button>
                                 ) : (
                                   <Button
-                                    onClick={() => {
-                                      SubmitFunction();
-                                      setOpen(false);
-                                    }}
+                                    onClick={updateExistingData}
                                     autoFocus
                                   >
                                     submit

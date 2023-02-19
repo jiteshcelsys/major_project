@@ -44,12 +44,12 @@ app.post("/PreviousFormClick", async (req, res) => {
 app.post("/emp_loginupdate", async (req, res) => {
   // console.log(req.body);
   const sqlData = await pool.query(
-    "update emp_login set indi_obj=$1,perfor_obj=$2 ,self_rating=$3 where emp_num=$4",
+    "update emp_login set perfor_obj=$1 ,self_rating=$2 where emp_num=$3 and indi_obj=$4 " ,
     [
-      req.body.indi_obj,
       req.body.perfor_obj,
       req.body.self_rating,
       req.body.emp_num,
+      req.body.indi_obj
     ]
   );
 });
